@@ -1,21 +1,24 @@
 import curses
 import save_and_load
 
-import curses
-
 def saved_drink_editing_menu(stdscr):
     """
     Menu for editing drinks using curses.
     """
-    # Initialize color pairs
+    # Initialize colors
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
-    BLACK_AND_GREEN = curses.color_pair(4)
+    GREEN_AND_WHITE = curses.color_pair(3)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
+    BLACK_AND_MAGENTA = curses.color_pair(6)
 
     header = r""" ________  _______   ______  ________        _______   _______   ______  __    __  __    __   ______  
 /        |/       \ /      |/        |      /       \ /       \ /      |/  \  /  |/  |  /  | /      \ 
@@ -86,7 +89,8 @@ $$$$$$$$/ $$$$$$$/  $$$$$$/    $$/          $$$$$$$/  $$/   $$/ $$$$$$/ $$/   $$
                 return  # Exit the menu
             elif len(drinks_and_amounts) > 0:  # Ensure valid drink selection
                 drink_name, amounts = drinks_and_amounts[current_row]
-                drink_making_menu(stdscr, drink_name, amounts)
+                save_and_load.remove_drink(drink_name)
+                new_drink_making_menu(stdscr, drink_name, amounts)
                 # Refresh menu after potential changes
                 menu_options = make_menu_options()
                 current_row = 0
@@ -100,12 +104,16 @@ def liquid_editing_menu(stdscr):
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
     GREEN_AND_WHITE = curses.color_pair(3)
-    BLACK_AND_GREEN = curses.color_pair(4)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
+    BLACK_AND_MAGENTA = curses.color_pair(6)
 
     header = r""" ________  _______   ______  ________        __        ______   ______   __    __  ______  _______    ______  
 /        |/       \ /      |/        |      /  |      /      | /      \ /  |  /  |/      |/       \  /      \ 
@@ -134,7 +142,7 @@ $$$$$$$$/ $$$$$$$/  $$$$$$/    $$/          $$$$$$$$/ $$$$$$/  $$$$$$  | $$$$$$/
 
             if i == current_row:
                 if selected:
-                    stdscr.addstr(line + "\n", GREEN_AND_WHITE)
+                    stdscr.addstr(line + "\n", BLACK_AND_MAGENTA)
                 else:
                     stdscr.addstr(line + "\n", BLACK_AND_GREEN)  # Highlight current row
             else:
@@ -177,23 +185,28 @@ $$$$$$$$/ $$$$$$$/  $$$$$$/    $$/          $$$$$$$$/ $$$$$$/  $$$$$$  | $$$$$$/
         
 
 
-def drink_making_menu(stdscr, name = "Unnamed", amounts = [0] * 6):
+def new_drink_making_menu(stdscr, name = "", amounts = [0]*6):
     """
     Menu for making a new drink with:
     - Enter Name: Name input stays on the main screen and blinks when selected.
     - Sliding bars for six ingredients, adjustable from 0% to 100%.
     - Save and Exit options.
     """
+    amounts = amounts[::]
     # Initialize colors
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(6, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
     GREEN_AND_WHITE = curses.color_pair(3)
-    BLACK_AND_GREEN = curses.color_pair(4)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
+    BLACK_AND_MAGENTA = curses.color_pair(6)
 
     header = r"""
  _______             __            __              __       __            __                           
@@ -209,6 +222,7 @@ $$$$$$$/  $$/       $$/ $$/   $$/ $$/   $$/       $$/      $$/  $$$$$$$/ $$/   $
     def return_percent_bar(num):
         """Returns a visual representation of a percentage bar."""
         return "[" + "■" * num + (10 - num) * " " + "]"
+
     liquids = save_and_load.load_liquids()
     max_liquid_length = max([len(liquid) for liquid in liquids])
     menu_options = ["Enter Name: "] + [liquid + ": " + " "*(max_liquid_length-len(liquid)) for liquid in liquids] + ["Save Drink", "Delete/Exit"]
@@ -228,7 +242,7 @@ $$$$$$$/  $$/       $$/ $$/   $$/ $$/   $$/       $$/      $$/  $$$$$$$/ $$/   $
 
             if i == current_row:
                 if selected:
-                    stdscr.addstr(line + "\n", GREEN_AND_WHITE)
+                    stdscr.addstr(line + "\n", BLACK_AND_MAGENTA)
                 else:
                     stdscr.addstr(line + "\n", BLACK_AND_GREEN)  # Highlight current row
             else:
@@ -239,8 +253,6 @@ $$$$$$$/  $$/       $$/ $$/   $$/ $$/   $$/       $$/      $$/  $$$$$$$/ $$/   $
     def input_name():
         """Allows the user to type a name directly on the menu."""
         nonlocal name
-        curses.curs_set(1)  # Show the cursor
-        name = ""
         while True:
             show_screen(selected=True)  # Blink background while editing
             key = stdscr.getch()
@@ -279,7 +291,6 @@ $$$$$$$/  $$/       $$/ $$/   $$/ $$/   $$/       $$/      $$/  $$$$$$$/ $$/   $
             elif 1 <= current_row <= 6:  # Adjust Amount bars
                 set_amount(current_row - 1)
             elif current_row == 7:  # Save Drink
-                # Add saving logic here
                 save_and_load.add_drink(name, amounts)
                 break #return to the previous menu
             elif current_row == 8:  # Exit\delete

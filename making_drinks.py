@@ -11,13 +11,18 @@ def connecting(stdscr):
     Non-blocking input is used to ensure the animation runs smoothly.
     """
     # Initialize colors
+    # Initialize colors
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
     curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
+    GREEN_AND_WHITE = curses.color_pair(3)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
 
     # Headers for animation
     headers = ["""  ______    ______   __    __  __    __  ________   ______   ________  ______  __    __   ______  
@@ -61,19 +66,20 @@ $$    $$/ $$    $$/ $$ | $$$ |$$ | $$$ |$$       |$$    $$/    $$ |   / $$   |$$
     # Set the terminal to non-blocking mode
     stdscr.nodelay(True)
 
-    last_time = time.time()
     connecting_index = 0
     connected = False
+    stdscr.clear()
+    stdscr.addstr(0, 0, headers[connecting_index], RED_AND_BLACK)
+    stdscr.addstr("\n\nMake sure that you are connected to the same wifi network as the Barduino.\n\nHold 'b' to exit", GREEN_AND_BLACK)
+    stdscr.refresh()
+    time.sleep(0.5) #delay a little bit to not flash the user
     while not connected:
         # Animation logic
-        if time.time() - last_time >= animation_speed:
-            connected = ping_pico()
-            last_time = time.time()
-            stdscr.clear()
-            stdscr.addstr(0, 0, headers[connecting_index], RED_AND_BLACK)
-            stdscr.addstr("\n\nMake sure that you are connected to the same wifi network as the Barduino.\n\nHold 'b' to exit", GREEN_AND_BLACK)
-            stdscr.refresh()
-            connecting_index = (connecting_index + 1) % len(headers)
+        stdscr.clear()
+        stdscr.addstr(0, 0, headers[connecting_index], RED_AND_BLACK)
+        stdscr.addstr("\n\nMake sure that you are connected to the same wifi network as the Barduino.\n\nHold 'b' to exit", GREEN_AND_BLACK)
+        stdscr.refresh()
+        connecting_index = (connecting_index + 1) % len(headers)
 
         # Non-blocking key input
         stdscr.nodelay(True)
@@ -81,9 +87,7 @@ $$    $$/ $$    $$/ $$ | $$$ |$$ | $$$ |$$       |$$    $$/    $$ |   / $$   |$$
         if key == ord('b'):  # Exit the function on 'b' key press
             stdscr.nodelay(False) #Change back to defalut blocking
             return False
-
-        # Small sleep to prevent excessive CPU usage
-        time.sleep(0.01)
+        connected = ping_pico()
     stdscr.nodelay(False)
     return True
 
@@ -108,15 +112,18 @@ def led_control_menu(stdscr):
 
 def drink_selection_menu(stdscr):
     # Initialize colors
+    # Initialize colors
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
     GREEN_AND_WHITE = curses.color_pair(3)
-    BLACK_AND_GREEN = curses.color_pair(4)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
 
     header = """ _______   _______   ______  __    __  __    __         ______   ________  __        ________   ______   ________  ______   ______   __    __ 
 /       \ /       \ /      |/  \  /  |/  |  /  |       /      \ /        |/  |      /        | /      \ /        |/      | /      \ /  \  /  |
@@ -191,12 +198,14 @@ def drink_making_menu(stdscr):
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
     GREEN_AND_WHITE = curses.color_pair(3)
-    BLACK_AND_GREEN = curses.color_pair(4)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
 
     header = """ _______   _______   ______  __    __  __    __        _______   _______   ________  _______  
 /       \ /       \ /      |/  \  /  |/  |  /  |      /       \ /       \ /        |/       \ 
@@ -276,19 +285,28 @@ $$$$$$$/  $$/   $$/ $$$$$$/ $$/   $$/ $$/   $$/       $$/       $$/   $$/ $$$$$$
             
 def make_drinks(stdscr, how_many, amounts):
     # Initialize colors
+    # Initialize colors
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_GREEN)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_GREEN)
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
     GREEN_AND_WHITE = curses.color_pair(3)
-    BLACK_AND_GREEN = curses.color_pair(4)
+    RED_AND_WHITE = curses.color_pair(4)
+    BLACK_AND_GREEN = curses.color_pair(5)
 
-    is_connected = connecting()
+    is_connected = connecting(stdscr)
     if not is_connected:
         return
+    
+    stdscr.clear()
+    stdscr.addstr("Connected to pico! :)", GREEN_AND_BLACK)
+    stdscr.refresh()
+    time.sleep(2)
+    return False
 
     loading_header = \
 """ __         ______    ______   _______          ______   __    __  _______    ______  
@@ -308,7 +326,7 @@ $$$$$$$$/  $$$$$$/  $$/   $$/ $$$$$$$/         $$$$$$/   $$$$$$/  $$/        $$$
         stdscr.clear()
         stdscr.addstr(loading_header + "\n", RED_AND_BLACK)
         stdscr.addstr("Put cup in front of sensor\n\n Hold 'b' to cancel", GREEN_AND_BLACK)
-        if time.time-last_time() > 0.2:
+        if time.time()-last_time > 0.2:
             cup_detected = pico_control.detect_cup() #implement this
             if cup_detected:
                 cups_loaded += 1

@@ -1,35 +1,47 @@
 import requests
 import time
 
-# Replace with the IP address of the Pico W (check in the console output of the Pico W)
-#This could change with MIT's dymaic IP allocation. Be careful
-PICO_IP = "http://10.29.240.252"
+try:
+    from config import PICO_IP #Be careful about dynamic IP
+except ImportError:
+    PICO_IP = None
+    print("Warning: PICO_IP not set. Ensure config.py exists.")
+
 
 def send_command(command):
     url = f"{PICO_IP}/{command}"
     try:
-        return requests.get(url).text
+        response = requests.get(url, timeout=3)
+        return response.text
     except requests.exceptions.RequestException as e:
         print("Failed to connect to Pico:", e)
-
-def control_led(command):
-    url = f"{PICO_IP}/led/{command}"
-    try:
-        response = requests.get(url)
-        print("Response from Pico:", response.text)
-    except requests.exceptions.RequestException as e:
-        print("Failed to connect to Pico:", e)
-
-def led_on(_):
-    control_led("on")
-
-def led_off(_):
-    control_led("off")
+        return False
 
 def ping_pico(_=None):
     try:
-        response = requests.get(PICO_IP, timeout=2)  # Send a basic GET request
+        response = requests.get(PICO_IP, timeout=3)  # Send a basic GET request
         if response.status_code == 200:
             return True
+        return False
     except requests.exceptions.RequestException:
         return False
+    
+def led_on(_=None):
+    return send_command("led/on")
+
+def led_off(_=None):
+    return send_command("led/off")
+
+def detect_cup(_=None):
+    return send_command("detect_cup")
+
+def advance_turntable(_=None):
+    return send_command("advance_turntable")
+
+if __name__ == "__main__":
+    while True:
+        led_on()
+        time.sleep(1)
+        led_off()
+        time.sleep(1)
+        print("Result of ping: " + str(ping_pico()))
