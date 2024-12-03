@@ -1,10 +1,10 @@
 {
     "liquids": [
-        "milk",
-        "coke",
-        "sprite",
-        "MILK",
-        "vodka",
-        "water"
+        "Water",
+        "Vodka",
+        "Baja Blast",
+        "Milk",
+        "Beer",
+        "Lime Juice"
     ]
 }

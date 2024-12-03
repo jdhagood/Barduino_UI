@@ -15,10 +15,17 @@ def saved_drink_editing_menu(stdscr):
 
     RED_AND_BLACK = curses.color_pair(1)
     GREEN_AND_BLACK = curses.color_pair(2)
-    GREEN_AND_WHITE = curses.color_pair(3)
     BLACK_AND_GREEN = curses.color_pair(4)
 
-    header = "Drink Editing Menu"
+    header = r""" ________  _______   ______  ________        _______   _______   ______  __    __  __    __   ______  
+/        |/       \ /      |/        |      /       \ /       \ /      |/  \  /  |/  |  /  | /      \ 
+$$$$$$$$/ $$$$$$$  |$$$$$$/ $$$$$$$$/       $$$$$$$  |$$$$$$$  |$$$$$$/ $$  \ $$ |$$ | /$$/ /$$$$$$  |
+$$ |__    $$ |  $$ |  $$ |     $$ |         $$ |  $$ |$$ |__$$ |  $$ |  $$$  \$$ |$$ |/$$/  $$ \__$$/ 
+$$    |   $$ |  $$ |  $$ |     $$ |         $$ |  $$ |$$    $$<   $$ |  $$$$  $$ |$$  $$<   $$      \ 
+$$$$$/    $$ |  $$ |  $$ |     $$ |         $$ |  $$ |$$$$$$$  |  $$ |  $$ $$ $$ |$$$$$  \   $$$$$$  |
+$$ |_____ $$ |__$$ | _$$ |_    $$ |         $$ |__$$ |$$ |  $$ | _$$ |_ $$ |$$$$ |$$ |$$  \ /  \__$$ |
+$$       |$$    $$/ / $$   |   $$ |         $$    $$/ $$ |  $$ |/ $$   |$$ | $$$ |$$ | $$  |$$    $$/ 
+$$$$$$$$/ $$$$$$$/  $$$$$$/    $$/          $$$$$$$/  $$/   $$/ $$$$$$/ $$/   $$/ $$/   $$/  $$$$$$/"""
     drinks_and_amounts = []
     current_row = 0
 
@@ -29,33 +36,37 @@ def saved_drink_editing_menu(stdscr):
         drinks_and_amounts.clear()
         drinks = save_and_load.load_drinks()
         liquids = save_and_load.load_liquids()
+        max_liquid_name_length = max([len(liquid) for liquid in liquids])
 
         if not drinks:
             return ["No drinks found. Press 'Back' to return."]
         
-        menu_options = ["Back"]
+        menu_options = []
         for drink_name, amounts in drinks.items():
             drinks_and_amounts.append([drink_name, amounts])
             title = f"{drink_name}\n"
             for liquid, amount in zip(liquids, amounts):
-                bar = f"<{'▇' * amount + ' ' * (10 - amount)}>"
-                title += f"  {liquid}: {bar}\n"
-            menu_options.append(title.strip())
+                bar = f"[{'■' * amount + ' ' * (10 - amount)}]"
+                title += f"  {liquid}:{" "*(max_liquid_name_length - len(liquid))} {bar}\n"
+            menu_options.append(title)
+        menu_options += ["Back"]
         return menu_options
 
     def show_screen():
         """
         Displays the menu screen.
         """
+        NUM_DRINKS = 3
         stdscr.clear()
         stdscr.addstr(f"{header.center(curses.COLS)}\n", RED_AND_BLACK)
         stdscr.addstr("-" * curses.COLS + "\n", GREEN_AND_BLACK)
 
         for i, line in enumerate(menu_options):
-            if i == current_row:
-                stdscr.addstr(line + "\n", BLACK_AND_GREEN)  # Highlight the current row
-            else:
-                stdscr.addstr(line + "\n", GREEN_AND_BLACK)
+            if NUM_DRINKS*(current_row//NUM_DRINKS) <= i and i < NUM_DRINKS*(current_row//NUM_DRINKS) + NUM_DRINKS:
+                if i == current_row:
+                    stdscr.addstr(line + "\n", BLACK_AND_GREEN)  # Highlight the current row
+                else:
+                    stdscr.addstr(line + "\n", GREEN_AND_BLACK)
 
         stdscr.refresh()
 
@@ -71,10 +82,10 @@ def saved_drink_editing_menu(stdscr):
         elif key == curses.KEY_DOWN and current_row < len(menu_options) - 1:
             current_row += 1
         elif key == ord('\n'):  # Enter key
-            if current_row == 0:  # "Back" selected
+            if current_row == len(menu_options)-1:  # "Back" selected
                 return  # Exit the menu
             elif len(drinks_and_amounts) > 0:  # Ensure valid drink selection
-                drink_name, amounts = drinks_and_amounts[current_row - 1]
+                drink_name, amounts = drinks_and_amounts[current_row]
                 drink_making_menu(stdscr, drink_name, amounts)
                 # Refresh menu after potential changes
                 menu_options = make_menu_options()
@@ -96,7 +107,16 @@ def liquid_editing_menu(stdscr):
     GREEN_AND_WHITE = curses.color_pair(3)
     BLACK_AND_GREEN = curses.color_pair(4)
 
-    header = r"Liquid Editing Menu"
+    header = r""" ________  _______   ______  ________        __        ______   ______   __    __  ______  _______    ______  
+/        |/       \ /      |/        |      /  |      /      | /      \ /  |  /  |/      |/       \  /      \ 
+$$$$$$$$/ $$$$$$$  |$$$$$$/ $$$$$$$$/       $$ |      $$$$$$/ /$$$$$$  |$$ |  $$ |$$$$$$/ $$$$$$$  |/$$$$$$  |
+$$ |__    $$ |  $$ |  $$ |     $$ |         $$ |        $$ |  $$ |  $$ |$$ |  $$ |  $$ |  $$ |  $$ |$$ \__$$/ 
+$$    |   $$ |  $$ |  $$ |     $$ |         $$ |        $$ |  $$ |  $$ |$$ |  $$ |  $$ |  $$ |  $$ |$$      \ 
+$$$$$/    $$ |  $$ |  $$ |     $$ |         $$ |        $$ |  $$ |_ $$ |$$ |  $$ |  $$ |  $$ |  $$ | $$$$$$  |
+$$ |_____ $$ |__$$ | _$$ |_    $$ |         $$ |_____  _$$ |_ $$ / \$$ |$$ \__$$ | _$$ |_ $$ |__$$ |/  \__$$ |
+$$       |$$    $$/ / $$   |   $$ |         $$       |/ $$   |$$ $$ $$< $$    $$/ / $$   |$$    $$/ $$    $$/ 
+$$$$$$$$/ $$$$$$$/  $$$$$$/    $$/          $$$$$$$$/ $$$$$$/  $$$$$$  | $$$$$$/  $$$$$$/ $$$$$$$/   $$$$$$/  
+                                                                   $$$/                                      """
     liquids = save_and_load.load_liquids()
     menu_options = [f"Liquid {n}: " for n in range(len(liquids))] + ["Save & Exit"]
 
@@ -105,6 +125,7 @@ def liquid_editing_menu(stdscr):
         """Displays the menu screen."""
         stdscr.clear()
         stdscr.addstr(header + "\n", RED_AND_BLACK)
+        stdscr.addstr("-" * curses.COLS + "\n", GREEN_AND_BLACK)
 
         for i, title in enumerate(menu_options):
             line = title
@@ -123,17 +144,19 @@ def liquid_editing_menu(stdscr):
     
     def input_drink_name(index):
         """Allows the user to type a name directly on the menu."""
-        liquids[index] = ""
         while True:
             show_screen(selected=True)  # Blink background while editing
             key = stdscr.getch()
+
             if key == ord('\n'):  # Finish editing on Enter
                 break
-            elif key == 127 or key == curses.KEY_BACKSPACE:  # Handle backspace
-                liquids[index] = liquids[index][:-1]
-            elif key >= 32 and key <= 126:  # Printable ASCII
+            elif key in (127, curses.KEY_BACKSPACE, 8):  # Handle backspace (127, curses.KEY_BACKSPACE, or 8)
+                if len(liquids[index]) > 0:
+                    liquids[index] = liquids[index][:-1]
+            elif 32 <= key <= 126:  # Printable ASCII
                 liquids[index] += chr(key)
-        show_screen()
+
+            show_screen()  # Refresh the screen to reflect updates
     
     while True:
         show_screen()
@@ -185,16 +208,17 @@ $$$$$$$/  $$/       $$/ $$/   $$/ $$/   $$/       $$/      $$/  $$$$$$$/ $$/   $
 """
     def return_percent_bar(num):
         """Returns a visual representation of a percentage bar."""
-        return "<" + "▇" * num + (10 - num) * " " + ">"
+        return "[" + "■" * num + (10 - num) * " " + "]"
     liquids = save_and_load.load_liquids()
-    menu_options = ["Enter Name: "] + [liquid + ": " for liquid in liquids] + ["Save Drink", "Delete/Exit"]
+    max_liquid_length = max([len(liquid) for liquid in liquids])
+    menu_options = ["Enter Name: "] + [liquid + ": " + " "*(max_liquid_length-len(liquid)) for liquid in liquids] + ["Save Drink", "Delete/Exit"]
     current_row = 0
 
     def show_screen(selected=False):
         """Displays the menu screen."""
         stdscr.clear()
         stdscr.addstr(header + "\n", RED_AND_BLACK)
-
+        stdscr.addstr("-" * curses.COLS + "\n", GREEN_AND_BLACK)
         for i, title in enumerate(menu_options):
             line = title
             if 1 <= i and i <=6:
@@ -222,7 +246,7 @@ $$$$$$$/  $$/       $$/ $$/   $$/ $$/   $$/       $$/      $$/  $$$$$$$/ $$/   $
             key = stdscr.getch()
             if key == ord('\n'):  # Finish editing on Enter
                 break
-            elif key == 127 or key == curses.KEY_BACKSPACE:  # Handle backspace
+            elif key in (127, curses.KEY_BACKSPACE, 8):  # Handle backspace
                 name = name[:-1]
             elif key >= 32 and key <= 126:  # Printable ASCII
                 name += chr(key)

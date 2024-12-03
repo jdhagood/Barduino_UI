@@ -1,13 +1,11 @@
 import curses
 from edit_drinks_menu import drink_making_menu, liquid_editing_menu, saved_drink_editing_menu
 from selection_menu import make_selection_menu
-from info_window import make_info_window
-import save_and_load
-
+from info_window import info_window
+from making_drinks import led_control_menu, drink_making_menu
 
 # ASCII header
-header = r"""
- _______                             __            __                     
+header = r""" _______                             __            __                     
 /       \                           /  |          /  |                    
 $$$$$$$  |  ______    ______    ____$$ | __    __ $$/  _______    ______  
 $$ |__$$ | /      \  /      \  /    $$ |/  |  /  |/  |/       \  /      \ tm
@@ -20,40 +18,31 @@ $$$$$$$/   $$$$$$$/ $$/        $$$$$$$/  $$$$$$/  $$/ $$/   $$/  $$$$$$/
 
 # Menu options
 start_menu = make_selection_menu("Start", [
-    ["Start\n Start \n Start", lambda _: 0],
+    ["Start", lambda _: 0],
     ["Back", lambda _: 1]
 ])
 
-drink_editing_menu = make_selection_menu("Edit Drinks", [
+drink_menu_header = r"""  _______   _______   ______  __    __  __    __         ______    ______   __    __  ________  ______   ______  
+/       \ /       \ /      |/  \  /  |/  |  /  |       /      \  /      \ /  \  /  |/        |/      | /      \ 
+$$$$$$$  |$$$$$$$  |$$$$$$/ $$  \ $$ |$$ | /$$/       /$$$$$$  |/$$$$$$  |$$  \ $$ |$$$$$$$$/ $$$$$$/ /$$$$$$  |
+$$ |  $$ |$$ |__$$ |  $$ |  $$$  \$$ |$$ |/$$/        $$ |  $$/ $$ |  $$ |$$$  \$$ |$$ |__      $$ |  $$ | _$$/ 
+$$ |  $$ |$$    $$<   $$ |  $$$$  $$ |$$  $$<         $$ |      $$ |  $$ |$$$$  $$ |$$    |     $$ |  $$ |/    |
+$$ |  $$ |$$$$$$$  |  $$ |  $$ $$ $$ |$$$$$  \        $$ |   __ $$ |  $$ |$$ $$ $$ |$$$$$/      $$ |  $$ |$$$$ |
+$$ |__$$ |$$ |  $$ | _$$ |_ $$ |$$$$ |$$ |$$  \       $$ \__/  |$$ \__$$ |$$ |$$$$ |$$ |       _$$ |_ $$ \__$$ |
+$$    $$/ $$ |  $$ |/ $$   |$$ | $$$ |$$ | $$  |      $$    $$/ $$    $$/ $$ | $$$ |$$ |      / $$   |$$    $$/ 
+$$$$$$$/  $$/   $$/ $$$$$$/ $$/   $$/ $$/   $$/        $$$$$$/   $$$$$$/  $$/   $$/ $$/       $$$$$$/  $$$$$$/  """
+drink_editing_menu = make_selection_menu(drink_menu_header, [
     ["Make New Drink", drink_making_menu],
     ["Edit Drinks", saved_drink_editing_menu],
     ["Edit Liquids", liquid_editing_menu],
     ["Back", lambda _: 1]
 ])
 
-#The Drink editing menu
-# def drink_editing_menu(stdscr):
-#     choices = [["Back", lambda _: 1],
-#                ["New Drink", drink_making_menu],
-#                ["Edit Liquids", lambda _: 0]]
-#     liquids = save_and_load.load_liquids()
-#     drinks = save_and_load.load_drinks()
-#     print(drinks)
-#     for drink, amounts in drinks.items():
-#         title = drink + "\n"
-#         for i, amount in enumerate(amounts):
-#             title += liquids[i] + ": " + "<" + "▇" * amount + (10 - amount) * " "  ">" + "\n"
-#         choices.append([title, drink_making_menu(stdscr, drink, amounts)])
-#     a = make_selection_menu("Drink Editing", choices)
-#     a(stdscr)
-
-info_menu = make_info_window("INFO", "This is information about the Barduino.")
-
 main_menu = make_selection_menu(header, [
-    ["Start \n Start ", start_menu],
-    ["Edit Drinks", drink_editing_menu],
-    ["Info", info_menu],
-    ["Exit", lambda _: True]
+    ("Make Drinks", drink_making_menu),
+    ("Drink Config", drink_editing_menu),
+    ("Info", info_window),
+    ("Exit", lambda _: True)
 ])
 
 def main(stdscr):

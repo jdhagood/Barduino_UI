@@ -85,5 +85,3 @@ def remove_drink(drink_name, file_name="drinks.json"):
 
 #save_liquids(["1", "2", "3", "4", "5", "6"])
 remove_drink("liquids")
-print(load_liquids())
-print(load_drinks())
